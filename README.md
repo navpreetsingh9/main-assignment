@@ -11,6 +11,7 @@ This repository contains the main PyTorch implementation of image classification
 - torch-summary
 - torch_lr_finder
 - grad-cam
+- Other common libraries (e.g., NumPy, Matplotlib)
 
 ## Usage
 
