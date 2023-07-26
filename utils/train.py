@@ -1,4 +1,4 @@
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 from torch.optim import SGD, Adam
