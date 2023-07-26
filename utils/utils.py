@@ -237,7 +237,7 @@ def plot_network_performance(epochs, train_losses, test_losses, train_acc, test_
     plt.show()
 
 
-def show_gradcam(model, img_loader, class_map, use_cuda, mean, std, count=10):
+def show_gradcam(model, incorrect, class_map, use_cuda, mean, std, count=10):
     target_layers  = [model.layer4[-1]]
     cam = GradCAM(model=model, target_layers=target_layers, use_cuda=use_cuda)
 
@@ -246,15 +246,16 @@ def show_gradcam(model, img_loader, class_map, use_cuda, mean, std, count=10):
 
     classes = list(class_map.keys())
     fig = plt.figure(figsize=(15, 5))
-    for imgs, labels in img_loader:
-        for i in range(count):
-            input_tensor = imgs[i].unsqueeze(0)
-            rgb_img = denormalize_image(input_tensor, mean, std).transpose(3, 1).numpy()[0]
-            grayscale_cam = cam(input_tensor=input_tensor)
-            grayscale_cam = grayscale_cam[0, :]
-            visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-            ax = fig.add_subplot(int(count / 10), 10, i + 1, xticks=[], yticks=[])
-            ax.set_title(f"{classes[labels[i]]}")
-            plt.imshow(visualization)
-        break
+    fig.suptitle("Correct_Label/Incorrect_Prediction", fontsize=16, fontweight="bold")
+    for i, (imgs, labels, pred, output) in enumerate(incorrect):
+        input_tensor = imgs.unsqueeze(0)
+        rgb_img = denormalize_image(input_tensor, mean, std).transpose(3, 1).numpy()[0]
+        grayscale_cam = cam(input_tensor=input_tensor)
+        grayscale_cam = grayscale_cam[0, :]
+        visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+        ax = fig.add_subplot(int(20 / 10), 10, i + 1, xticks=[], yticks=[])
+        ax.set_title(f'{classes[labels.item()]}/{classes[pred.item()]}')
+        plt.imshow(visualization)
+        if i+1 == count:
+            break
     plt.show()
